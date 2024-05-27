@@ -1,0 +1,16 @@
+include:
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+container_scanning:
+  variables:
+    CS_IMAGE: $CI_REGISTRY_IMAGE/tutorial-image
+
+build-image:
+  image: docker:24.0.2
+  stage: build
+  services:
+    - docker:24.0.2-dind
+  script:
+    - docker build --tag $CI_REGISTRY_IMAGE/tutorial-image --file Dockerfile .
+    - docker login --username gitlab-ci-token --password $CI_JOB_TOKEN $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/tutorial-image
